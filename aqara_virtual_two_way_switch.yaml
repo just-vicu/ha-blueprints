@@ -32,20 +32,20 @@ variables:
 
 condition:
   - condition: template
-    value_template: "{{ trigger.payload_json[state_key] in ['ON','OFF'] }}"
+    value_template: '{{ trigger.payload_json[state_key] in ["ON","OFF"] }}'
 
 action:
   - choose:
       - conditions:
           - condition: template
-            value_template: "{{ trigger.payload_json[state_key] == 'ON' }}"
+            value_template: '{{ trigger.payload_json[state_key] == "ON" }}'
         sequence:
           - service: switch.turn_on
             target:
               entity_id: !input relay_switch
       - conditions:
           - condition: template
-            value_template: "{{ trigger.payload_json[state_key] == 'OFF' }}"
+            value_template: '{{ trigger.payload_json[state_key] == "OFF" }}'
         sequence:
           - service: switch.turn_off
             target:
