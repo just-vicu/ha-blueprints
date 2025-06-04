@@ -33,7 +33,16 @@ condition:
       {{ trigger.payload_json[inputs.state_key] in ['ON','OFF'] }}
 
 action:
-  - service: "switch.turn_{{ trigger.payload_json[inputs.state_key] | lower }}"
-    target:
-      entity_id: !input relay_switch
+  - choose:
+      - conditions: "{{ trigger.payload_json[inputs.state_key] == 'ON' }}"
+        sequence:
+          - service: switch.turn_on
+            target:
+              entity_id: !input relay_switch
+      - conditions: "{{ trigger.payload_json[inputs.state_key] == 'OFF' }}"
+        sequence:
+          - service: switch.turn_off
+            target:
+              entity_id: !input relay_switch
+
 mode: single
