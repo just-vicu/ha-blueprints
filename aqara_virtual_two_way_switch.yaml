@@ -1,0 +1,39 @@
+blueprint:
+  name: Aqara Sync Virtual Zigbee2MQTT Button to Relay Switch
+  description: >
+    Sync a decoupled (virtual) Zigbee2MQTT button (state_left or state_right) to a relay switch.
+    When the button is pressed, the relay is set to the same state (ON/OFF).
+  domain: automation
+  input:
+    mqtt_topic:
+      name: Zigbee2MQTT topic
+      description: The MQTT topic published by your virtual/decoupled button (e.g. zigbee2mqtt/GF - S1)
+      selector:
+        text:
+    state_key:
+      name: State key in MQTT payload
+      description: The key for the button state (usually state_left or state_right)
+      default: state_left
+      selector:
+        text:
+    relay_switch:
+      name: Relay Switch
+      description: The Home Assistant entity controlling the relay/bulb (e.g. switch.gf_s3_left)
+      selector:
+        entity:
+          domain: switch
+
+trigger:
+  - platform: mqtt
+    topic: !input mqtt_topic
+
+condition:
+  - condition: template
+    value_template: >
+      {{ trigger.payload_json[inputs.state_key] in ['ON','OFF'] }}
+
+action:
+  - service: "switch.turn_{{ trigger.payload_json[inputs.state_key] | lower }}"
+    target:
+      entity_id: !input relay_switch
+mode: single
